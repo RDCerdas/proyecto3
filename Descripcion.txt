@@ -1,0 +1,20 @@
+Se implementó una versión equivalente al Test_CR_fifo dado por el profesor, pero realizando algunas pequeñas variaciones.
+
+La más grande fue unir el scoreboard y el checker. La forma en que se trabajó es que durante la corrida de la prueba el scoreboard se comporta como el checker, a diferencia de es que esta vez guarda los paquetes en una cola en lugar de enviarla al scoreboard. Al terminar la fase de pruebas se pasa a la fase de reportes que es donde el scoreboard realiza un reporte equivalente al realizado anteriormente, donde imprime la información de cada paquete e imprime el reporte promedio.
+
+Para demostrar la equivalencia en capacidades se implementaron dos tests. El primero es equivalente al brindado por el profesor en los archivos originales y el segundo es equivalente al entregado como parte de un quiz anterior donde se hacían 4 pruebas específicas.
+
+En lugar de utilizar diferentes tipos de transacciones en el agente, para generar las diferentes variaciones (transacciones aleatorias, transacciones específicas y llenado aleatorio) lo que se hizo fue generar diferentes secuencias. Estas secuencias pueden ser instanciadas y modificadas mediantes sus parámetros internos para generar todas las variaciones que estaban antes disponibles. En total se implementaron 4 tipos de secuencias que corresponde las originales que poseía el agente. Cada secuencia genera transacciones que son mandadas al driver a través de un secuenciador.
+
+Finalmente, se utilizaron métodos de impresion propios de UVM en toda la prueba reemplazando los anteriores displays. Esto permite variar la verbosidad para imprimir menos o más información. El entregable fue seteado UVM_LOW por lo que solo imprime lo más importantes. Si se quieren ver todas las transacciones se puede usar UVM_DEBUG.
+
+La ecuación del código se realiza de la siguiente forma:
+
+Se configuran las herramientas y se compila con:
+source comando.sh
+
+Después de esto es posible elegir cual prueba se quiere correr ya sea test_especifico o test_normal, los comando se verían de la siguiente forma:
+./salida +UVM_TESTNAME=test_especifico
+./salida +UVM_TESTNAME=test_normal
+
+test_normal corresponde al de los archivos originales y test_especifico a la versión con transacciones especificas implementada.

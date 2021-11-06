@@ -1,13 +1,12 @@
 // Interfaz original
-interface fifo_if #(parameter width =16) (
+interface mult_if(
   input clk
 );
-  logic rst;
-  logic pndng;
-  logic full;
-  logic push;
-  logic pop;
-  logic [width-1:0] dato_in; 
-  logic [width-1:0] dato_out;
+  logic [2:0] r_mode;
+  logic [31:0] fp_X;
+  logic [31:0] fp_Y;
+  logic [31:0] fp_Z;
+  logic ovrf;
+  logic udrf;
 
   endinterface

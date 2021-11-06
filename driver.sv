@@ -1,12 +1,10 @@
 // Driver
-class driver #(parameter width =16) extends uvm_driver #(trans_fifo);
+class driver #(parameter width =16) extends uvm_driver #(trans_fifo); //fixme
     `uvm_component_utils(driver)
-    
-    int espera;
 
-    uvm_analysis_port #(trans_fifo #(.width(width))) driver_aport;
+    uvm_analysis_port #(trans_fifo) driver_aport; //fixme
 
-    virtual fifo_if #(.width(width)) vif;
+    virtual mult_if vif;
 
     function new(string name = "driver", uvm_component parent = null);
         super.new(name, parent);
@@ -15,7 +13,7 @@ class driver #(parameter width =16) extends uvm_driver #(trans_fifo);
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-        if(!uvm_config_db#(virtual fifo_if)::get(this, "", "_if", vif))
+        if(!uvm_config_db#(virtual mult_if)::get(this, "", "_if", vif))
             `uvm_fatal("Driver", "Could not get vif")
     	driver_aport = new("driver_aport", this);
     endfunction
@@ -29,56 +27,36 @@ class driver #(parameter width =16) extends uvm_driver #(trans_fifo);
         @(posedge vif.clk);
         forever begin
             trans_fifo #(.width(width)) item;
-            vif.push = 0;
-            vif.rst = 0;
-            vif.pop = 0;
-            vif.dato_in = 0;
-            espera = 0;
-            @(posedge vif.clk);
-            // Se extrae nuevo item
+
+            // Se extrae nuevo item y se espera a flanco de reloj
             seq_item_port.get_next_item(item);
+            @(posedge vif.clk);
+
             `uvm_info("DRIVER", $sformatf("\nItem receive \n %s", item.sprint()), UVM_HIGH)
-           driver_item(item);
+            driver_item(item);
+
+            // Se espera al resultado
+            @(posedge vif.clk);
+            // Se envía el resultado al scoreboard
+            get_result(item);
+
 	        seq_item_port.item_done();
 
         end
     endtask
 	
 	// Funcion para realizar acciones con cada dato
-    virtual task driver_item(trans_fifo #(.width(width)) transaction);
-        while(this.espera < transaction.retardo)begin
-          @(posedge vif.clk);
-          this.espera = this.espera+1;
-          vif.dato_in = transaction.dato;
-	end
-        // Case tomado de archivo original
-        case(transaction.tipo)
-	  lectura: begin
-	     transaction.dato = vif.dato_out;
-	     transaction.tiempo = $time;
-	     @(posedge vif.clk);
-	     vif.pop = 1;
-	     driver_aport.write(transaction);
-         `uvm_info("DRIVER", $sformatf("\nItem send to scoreboard \n %s", transaction.sprint()), UVM_HIGH)
-	   end
-	   escritura: begin
-	     vif.push = 1;
-	     transaction.tiempo = $time;
-	     driver_aport.write(transaction);
-         `uvm_info("DRIVER", $sformatf("\nItem send to scoreboard \n %s", transaction.sprint()), UVM_HIGH)
-	   end
-	   reset: begin
-	     vif.rst =1;
-	     transaction.tiempo = $time;
-	     driver_aport.write(transaction);
-         `uvm_info("DRIVER", $sformatf("\nItem send to scoreboard \n %s", transaction.sprint()), UVM_HIGH) 
-	   end
-	  default: begin
-		`uvm_error("DRIVER", "Wrong type transaction")
-		$finish;
+    virtual task driver_item( item);//fixme
+        vif.r_mode = item.r_mode;
+        vif.fp_X = item.fp_X;
+    endtask
 
-	     end 
-	    endcase    
-	    @(posedge vif.clk);
+    // Funcion para almacenar resultado en item y enviarlo a scoreboard
+    virtual task get_result( item);//fixme
+        item.fp_Z = vif.fp_Z;
+        item.ovrf = vif.ovrf;
+        item.udrf = vif.udrf;
+        driver_aport.write(item);
+        `uvm_info("DRIVER", $sformatf("\nItem send to checker \n %s", item.sprint()), UVM_DEBUG)
     endtask
 endclass

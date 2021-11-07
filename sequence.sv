@@ -24,9 +24,127 @@ class sec_trans_aleatorias extends uvm_sequence;
 endclass
 
 //Prueba con numero muy grande
+
+class trans_especifica extends uvm_sequence;
+    `uvm_object_utils_begin(trans_especifica)
+        `uvm_field_int(dto_spec, UVM_DEFAULT)
+        `uvm_field_enum(tipo_trans, tpo_spec, UVM_DEFAULT)
+        `uvm_field_int(ret_spec, UVM_DEFAULT|UVM_DEC)
+    `uvm_object_utils_end
+
+    tipo_trans tpo_spec;
+    bit [width-1:0] dto_spec;
+    int ret_spec = 2;
+
+    function new(string name = "trans_especifica");
+        super.new(name);
+    endfunction
+
+    virtual task body(); 
+        trans_fifo item = trans_fifo::type_id::create("item");
+    	`uvm_info("SEQUENCE", $sformatf("\nEspecific transaction created\n %s\n", this.sprint()), UVM_HIGH)
+        start_item(item);
+        item.tipo = this.tpo_spec;
+        item.dato = this.dto_spec;
+        item.retardo = this.ret_spec;
+        `uvm_info("SEQ", $sformatf("\nNew item: \n %s", item.sprint()), UVM_MEDIUM)
+        finish_item(item);
+    endtask
+
+endclass
+
 //Prueba multiplicar 0 con infinito 
+
+class trans_especifica extends uvm_sequence;
+    `uvm_object_utils_begin(trans_especifica)
+        `uvm_field_int(dto_spec, UVM_DEFAULT)
+        `uvm_field_enum(tipo_trans, tpo_spec, UVM_DEFAULT)
+        `uvm_field_int(ret_spec, UVM_DEFAULT|UVM_DEC)
+    `uvm_object_utils_end
+
+    tipo_trans tpo_spec;
+    bit [width-1:0] dto_spec;
+    int ret_spec = 2;
+
+    function new(string name = "trans_especifica");
+        super.new(name);
+    endfunction
+
+    virtual task body(); 
+        trans_fifo item = trans_fifo::type_id::create("item");
+    	`uvm_info("SEQUENCE", $sformatf("\nEspecific transaction created\n %s\n", this.sprint()), UVM_HIGH)
+        start_item(item);
+        item.tipo = this.tpo_spec;
+        item.dato = this.dto_spec;
+        item.retardo = this.ret_spec;
+        `uvm_info("SEQ", $sformatf("\nNew item: \n %s", item.sprint()), UVM_MEDIUM)
+        finish_item(item);
+    endtask
+
+endclass
+
 // Prueba multiplicar 0 con 0
+
+class trans_especifica extends uvm_sequence;
+    `uvm_object_utils_begin(trans_especifica)
+        `uvm_field_int(dto_spec, UVM_DEFAULT)
+        `uvm_field_enum(tipo_trans, tpo_spec, UVM_DEFAULT)
+        `uvm_field_int(ret_spec, UVM_DEFAULT|UVM_DEC)
+    `uvm_object_utils_end
+
+    tipo_trans tpo_spec;
+    bit [width-1:0] dto_spec;
+    int ret_spec = 2;
+
+    function new(string name = "trans_especifica");
+        super.new(name);
+    endfunction
+
+    virtual task body(); 
+        trans_fifo item = trans_fifo::type_id::create("item");
+    	`uvm_info("SEQUENCE", $sformatf("\nEspecific transaction created\n %s\n", this.sprint()), UVM_HIGH)
+        start_item(item);
+        item.tipo = this.tpo_spec;
+        item.dato = this.dto_spec;
+        item.retardo = this.ret_spec;
+        `uvm_info("SEQ", $sformatf("\nNew item: \n %s", item.sprint()), UVM_MEDIUM)
+        finish_item(item);
+    endtask
+
+endclass
+
 //Prueba multiplicar infinito con infinito
+
+class trans_especifica extends uvm_sequence;
+    `uvm_object_utils_begin(trans_especifica)
+        `uvm_field_int(dto_spec, UVM_DEFAULT)
+        `uvm_field_enum(tipo_trans, tpo_spec, UVM_DEFAULT)
+        `uvm_field_int(ret_spec, UVM_DEFAULT|UVM_DEC)
+    `uvm_object_utils_end
+
+    tipo_trans tpo_spec;
+    bit [width-1:0] dto_spec;
+    int ret_spec = 2;
+
+    function new(string name = "trans_especifica");
+        super.new(name);
+    endfunction
+
+    virtual task body(); 
+        trans_fifo item = trans_fifo::type_id::create("item");
+    	`uvm_info("SEQUENCE", $sformatf("\nEspecific transaction created\n %s\n", this.sprint()), UVM_HIGH)
+        start_item(item);
+        item.tipo = this.tpo_spec;
+        item.dato = this.dto_spec;
+        item.retardo = this.ret_spec;
+        `uvm_info("SEQ", $sformatf("\nNew item: \n %s", item.sprint()), UVM_MEDIUM)
+        finish_item(item);
+    endtask
+
+endclass
+
+//
+
 class trans_aleatoria extends uvm_sequence;
     `uvm_object_utils_begin(trans_aleatoria)
         `uvm_field_int(max_retardo, UVM_DEFAULT|UVM_DEC)

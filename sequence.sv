@@ -1,13 +1,8 @@
 
 //Pruebas secuencia pruebas aleatorias
 class sec_trans_aleatorias extends uvm_sequence;
-    `uvm_object_utils_begin(sec_trans_aleatorias)
-        `uvm_field_int(num_transacciones, UVM_DEFAULT|UVM_DEC)
-        `uvm_field_int(max_retardo, UVM_DEFAULT|UVM_DEC)
-    `uvm_object_utils_end
 
-    int num_transacciones = 2;
-    int max_retardo = 10;
+    `uvm_object_utils(sec_trans_aleatorias)
 
     function new(string name = "sec_trans_aleatorias");
         super.new(name);
@@ -16,12 +11,11 @@ class sec_trans_aleatorias extends uvm_sequence;
     virtual task body();
         `uvm_info("SEQUENCE", $sformatf("\nSec random transactions created\n %s\n", this.sprint()), UVM_HIGH)
         for(int i = 0; i<num_transacciones; i++) begin
-            trans_fifo item = trans_fifo::type_id::create("item");
+            trans_mul item = trans_mul::type_id::create("item");
             start_item(item);
             if(!item.randomize()) begin
                 `uvm_error("No randomized", $sformatf("\nUnable to randomize seq_item"));
             end
-            item.max_retardo = max_retardo;
             `uvm_info("SEQ", $sformatf("\nNew item: \n %s", item.sprint()), UVM_MEDIUM)
             finish_item(item);
         end

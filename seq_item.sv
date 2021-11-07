@@ -23,8 +23,6 @@ bit udrf;
   endfunction 
 endclass
 
-
-endclass
 class trans_fifo #(parameter width = 16) extends uvm_sequence_item;
 
   `uvm_object_utils_begin(trans_fifo)

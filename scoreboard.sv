@@ -2,7 +2,7 @@
 import uvm_pkg::*;
 
 // Union de checker scoreboard, se le añaden colas del scoreboard
-class scoreboard #(parameter width =16, parameter depth = 8) extends uvm_scoreboard;
+class scoreboard extends uvm_scoreboard;
   `uvm_component_utils(scoreboard)
   // Puerto de transacciones del driver
   uvm_analysis_imp #(trans_mul, scoreboard) m_analysis_imp;
@@ -18,6 +18,8 @@ class scoreboard #(parameter width =16, parameter depth = 8) extends uvm_scorebo
 
   virtual function void write(trans_mul t);
     `uvm_info("SCOREBOARD", $sformatf("\nTransaction received\n%s\n", t.sprint()), UVM_DEBUG)
+    shortreal m_fp_Y = t.fp_Y;
+    shortreal m_fp_X = t.fp_X;
     
   endfunction
 

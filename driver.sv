@@ -1,8 +1,8 @@
 // Driver
-class driver #(parameter width =16) extends uvm_driver #(trans_fifo); //fixme
+class driver #(parameter width =16) extends uvm_driver #(trans_mul);
     `uvm_component_utils(driver)
 
-    uvm_analysis_port #(trans_fifo) driver_aport; //fixme
+    uvm_analysis_port #(trans_mul) driver_aport;
 
     virtual mult_if vif;
 
@@ -26,7 +26,7 @@ class driver #(parameter width =16) extends uvm_driver #(trans_fifo); //fixme
         // Logica que corre continuamente
         @(posedge vif.clk);
         forever begin
-            trans_fifo #(.width(width)) item;
+            trans_mul #(.width(width)) item;
 
             // Se extrae nuevo item y se espera a flanco de reloj
             seq_item_port.get_next_item(item);
@@ -46,13 +46,13 @@ class driver #(parameter width =16) extends uvm_driver #(trans_fifo); //fixme
     endtask
 	
 	// Funcion para realizar acciones con cada dato
-    virtual task driver_item( item);//fixme
+    virtual task driver_item(trans_mul item);
         vif.r_mode = item.r_mode;
         vif.fp_X = item.fp_X;
     endtask
 
     // Funcion para almacenar resultado en item y enviarlo a scoreboard
-    virtual task get_result( item);//fixme
+    virtual task get_result(trans_mul item);
         item.fp_Z = vif.fp_Z;
         item.ovrf = vif.ovrf;
         item.udrf = vif.udrf;

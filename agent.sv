@@ -3,7 +3,7 @@ class agent #(parameter width =16, parameter depth = 8) extends uvm_agent;
     `uvm_component_utils(agent)
     
     driver #(.width(width)) driver_inst;
-    uvm_sequencer #(trans_fifo #(.width(width))) sequencer_inst;
+    uvm_sequencer #(trans_mul #(.width(width))) sequencer_inst;
 
     function new(string name = "agent", uvm_component parent = null);
         super.new(name, parent);
@@ -14,7 +14,7 @@ class agent #(parameter width =16, parameter depth = 8) extends uvm_agent;
 		//Driver
         driver_inst = driver::type_id::create("driver_inst", this);
 		//Secuenciador
-        sequencer_inst = uvm_sequencer #(trans_fifo)::type_id::create("sequencer_inst", this);
+        sequencer_inst = uvm_sequencer #(trans_mul)::type_id::create("sequencer_inst", this);
     endfunction
 
     virtual function void connect_phase(uvm_phase phase);

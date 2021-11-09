@@ -24,9 +24,9 @@ endclass
 
 // Test que hereda del base con transacciones específicas
 class random_test extends base_test;
-    `uvm_component_utils(test_especifico)
+    `uvm_component_utils(random_test)
 
-    function new(string name = "test_especifico", uvm_component parent = null);
+    function new(string name = "random_test", uvm_component parent = null);
         super.new(name, parent);
     endfunction
 

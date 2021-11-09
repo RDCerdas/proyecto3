@@ -45,7 +45,7 @@ class trans_especifica extends uvm_sequence;
     	`uvm_info("SEQUENCE", $sformatf("\nEspecific transaction created\n %s\n", this.sprint()), UVM_HIGH)
         start_item(item);
         item.fp_X = this.fp_X;
-        item.fp_y = this.fp_y;
+        item.fp_Y = this.fp_Y;
         item.r_mode = this.r_mode;
         `uvm_info("SEQ", $sformatf("\nNew item: \n %s", item.sprint()), UVM_MEDIUM)
         finish_item(item);

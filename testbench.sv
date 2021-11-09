@@ -28,6 +28,7 @@ module test_bench;
   top DUT(.r_mode(_if.r_mode),
           .fp_X(_if.fp_X),
           .fp_Y(_if.fp_Y),
+	  .clk(_if.clk),
           
           .fp_Z(_if.fp_Z),
           .ovrf(_if.ovrf),

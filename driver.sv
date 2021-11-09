@@ -22,7 +22,6 @@ class driver #(parameter width =16) extends uvm_driver #(trans_mul);
     virtual task run_phase(uvm_phase phase);
         super.run_phase(phase);
             @(posedge vif.clk);
-        vif.rst=1;
         // Logica que corre continuamente
         @(posedge vif.clk);
         forever begin

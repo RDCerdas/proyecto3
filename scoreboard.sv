@@ -10,6 +10,8 @@ class scoreboard extends uvm_scoreboard;
   shortreal m_fp_Y;
   shortreal m_fp_X;
   real m_fp_Z;
+  bit [63:0] m_fp_Z_bits;
+  bit [31:0] m_fp_Z_expected;
 
   function new(string name = "scoreboard", uvm_component parent = null);
     super.new(name, parent);
@@ -22,12 +24,32 @@ class scoreboard extends uvm_scoreboard;
 
   virtual function void write(trans_mul t);
     `uvm_info("SCOREBOARD", $sformatf("\nTransaction received\n%s\n", t.sprint()), UVM_DEBUG)
+    // Conversion de shortreal type
     m_fp_Y = $bitstoshortreal(t.fp_Y);
     m_fp_X = $bitstoshortreal(t.fp_X);
+
+    // 64 bits operation
     m_fp_Z = m_fp_Y*m_fp_X;
-    m_fp_Z = $realtobits(m_fp_Z);
-    $display("fp_Y = %h, fp_X = %h, m_fp_Y = %h, m_fp_X = %h", t.fp_Y, t.fp_X, m_fp_Y, m_fp_X);    
-    $display("fp_Z = %h, m_fp_Z = %h", t.fp_Z, m_fp_Z); 
+
+    // Converts to binary representation
+    m_fp_Z_bits = $realtobits(m_fp_Z);
+
+    // Same sign bit
+    m_fp_Z_expected[31] = m_fp_Z_bits[63];
+
+    // Conversion to 64 bit exponent to 32
+    m_fp_Z_expected[30:21] = m_fp_Z_bits[62:52]-1023+127;
+    
+    // First 22 bits of mantisa
+    m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29]
+
+    // Round bit
+    if (m_fp_Z_expected != t.fp_Z) begin
+      `uvm_error("SCOREBOARD", $sformatf("Invalid result expected = %h, receive = %h", m_fp_Z_expected, t.fp_Z));
+    end
+
+    //$display("fp_Y = %h, fp_X = %h, m_fp_Y = %h, m_fp_X = %h", t.fp_Y, t.fp_X, m_fp_Y, m_fp_X);    
+    //$display("fp_Z = %h, m_fp_Z = %h", t.fp_Z, m_fp_Z); 
   endfunction
 
     virtual function void report_phase(uvm_phase phase);

@@ -10,9 +10,19 @@ class scoreboard extends uvm_scoreboard;
   shortreal m_fp_Y;
   shortreal m_fp_X;
   real m_fp_Z;
-  shortreal m_fp_Z_32_bits;
+  bit [31:0] m_fp_Z_32_mult;
   bit [63:0] m_fp_Z_bits;
+
   bit [31:0] m_fp_Z_expected;
+  bit m_ovrf_expected;
+  bit m_udrf_expected;
+  bit m_round_bit;
+  bit m_guard_bit;
+  bit m_sticky_bit;
+  bit m_sign_bit;
+
+  bit [7:0] z_plus_exp;
+  bit [23:0] z_plus_mant;
 
   function new(string name = "scoreboard", uvm_component parent = null);
     super.new(name, parent);
@@ -31,30 +41,107 @@ class scoreboard extends uvm_scoreboard;
 
     // 64 bits operation
     m_fp_Z = m_fp_Y*m_fp_X;
-    m_fp_Z_32_bits = m_fp_Z;
 
-    // Converts to binary representation
-    m_fp_Z_bits = $realtobits(m_fp_Z);
+    // Convert to 32 bit representation
+    m_fp_Z_32_mult = $shortrealtobits(m_fp_Z));
 
-    $display("Float = %h", $shortrealtobits(m_fp_Z));
+    // If underflow
+    if (m_fp_Z_32_mult[30:23] == 0) begin
+      m_fp_Z_expected[31] = m_fp_Z_32_mult[31];
+      m_fp_Z_expected[30:23] = '0;
+      m_fp_Z_expected[22:0] = '0;
+      m_ovrf_expected = 0;
+      m_udrf_expected = 1;
 
-    // Same sign bit
-    m_fp_Z_expected[31] = m_fp_Z_bits[63];
+    else if ((m_fp_Z_32_mult[30:23] == 8'hFF)) end
+      m_fp_Z_expected[31] = m_fp_Z_32_mult[31];
+      m_fp_Z_expected[22:0] = m_fp_Z_32_mult[22:0]
+      m_fp_Z_32_mult[30:23] = 8'hFF;
+      m_ovrf_expected = (m_fp_Z_expected[22])? 0 : 1;
+      m_udrf_expected = 0;
 
-    $display("Exponente = %h", m_fp_Z_bits[62:52]);
-    // Conversion to 64 bit exponent to 32
-    m_fp_Z_expected[30:23] = m_fp_Z_bits[62:52]-896;
-    
-    // First 22 bits of mantisa
-    m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
+    end else begin
+      // Converts to 64 binary representation to use the extra bits
+      m_fp_Z_bits = $realtobits(m_fp_Z);
 
-    // Round bit
-    if (m_fp_Z_expected != t.fp_Z) begin
-      `uvm_error("SCOREBOARD", $sformatf("Invalid result expected = %h, receive = %h", m_fp_Z_expected, t.fp_Z));
+      // Same sign bit
+      m_fp_Z_expected[31] = m_fp_Z_bits[63];
+      // Conversion to 64 bit exponent to 32
+      m_fp_Z_expected[30:23] = m_fp_Z_bits[62:52]-896;
+
+      m_round_bit = m_fp_Z_bits[28];
+      m_guard_bit = m_fp_Z_bits[27];
+      m_sticky_bit = m_fp_Z_bits[26];
+      m_sign_bit = m_fp_Z_expected[31];
+
+      z_plus_exp = m_fp_Z_expected[30:23] - 1;
+      z_plus_mant = m_fp_Z_bits[51:29] + 1;
+
+      // If carry occurs shift right
+      if(z_plus_mant[23] == 1) begin
+        z_plus_mant = z_plus_mant >> 1;
+      end
+
+      case (t.r_mode)
+        3'b000: begin
+          if (m_round_bit == 0) begin end
+             m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
+          end
+          if else (m_round_bit && (m_guard_bit && m_sticky_bit)) begin
+             m_fp_Z_expected[30:23]  = z_plus_exp;
+             m_fp_Z_expected[22:0] = z_plus_mant[22:0];
+          end else begin
+            // Choose even
+            if(m_fp_Z_bits[29]==0) begin
+              m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
+            end else begin
+              m_fp_Z_expected[22:0] = z_plus_mant[22:0];
+            end
+          end
+
+        end
+
+        3'b001: begin
+          m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
+        end
+
+        3'b010: begin
+          if(m_sign_bit == 0) begin
+            m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
+          end else begin
+            m_fp_Z_expected[22:0] = z_plus_mant[22:0];
+          end
+        end
+
+        3'b011: begin
+          if(m_sign_bit == 0) begin
+            m_fp_Z_expected[22:0] = z_plus_mant[22:0];
+          end else begin
+            m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
+          end
+        end
+
+        3'b100: begin
+          if(m_round_bit == 0) begin
+            m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
+          end else begin
+            m_fp_Z_expected[22:0] = z_plus_mant[22:0];
+          end
+        end
+
+        default: begin
+          m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
+        end
+      endcase
     end
 
-    //$display("fp_Y = %h, fp_X = %h, m_fp_Y = %h, m_fp_X = %h", t.fp_Y, t.fp_X, m_fp_Y, m_fp_X);    
-    //$display("fp_Z = %h, m_fp_Z = %h", t.fp_Z, m_fp_Z); 
+
+    // Round bit
+    if (m_fp_Z_expected != t.fp_Z || t.ovrf != m_ovrf_expected || t.udrf != m_udrf_expected) begin
+      `uvm_error("SCOREBOARD", $sformatf("Invalid result expected = %h, receive = %h \novrf_expected = %h, receive = %h\ undrflw_expected = %h, receive = %h", 
+       m_fp_Z_expected, t.fp_Z, m_ovrf_expected, t.ovrf, m_udrf_expected, t.udrf));
+    end
+
   endfunction
 
     virtual function void report_phase(uvm_phase phase);

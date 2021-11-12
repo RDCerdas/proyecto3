@@ -1,9 +1,9 @@
 // Agente
-class agent #(parameter width =16, parameter depth = 8) extends uvm_agent;
+class agent  extends uvm_agent;
     `uvm_component_utils(agent)
     
-    driver #(.width(width)) driver_inst;
-    uvm_sequencer #(trans_mul #(.width(width))) sequencer_inst;
+    driver driver_inst;
+    uvm_sequencer  sequencer_inst;
 
     function new(string name = "agent", uvm_component parent = null);
         super.new(name, parent);

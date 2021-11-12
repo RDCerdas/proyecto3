@@ -43,7 +43,7 @@ class scoreboard extends uvm_scoreboard;
     m_fp_Z = m_fp_Y*m_fp_X;
 
     // Convert to 32 bit representation
-    m_fp_Z_32_mult = $shortrealtobits(m_fp_Z));
+    m_fp_Z_32_mult = $shortrealtobits(m_fp_Z);
 
     // If underflow
     if (m_fp_Z_32_mult[30:23] == 0) begin
@@ -53,16 +53,20 @@ class scoreboard extends uvm_scoreboard;
       m_ovrf_expected = 0;
       m_udrf_expected = 1;
 
-    else if ((m_fp_Z_32_mult[30:23] == 8'hFF)) end
+     end else if ((m_fp_Z_32_mult[30:23] == 8'hFF)) begin
       m_fp_Z_expected[31] = m_fp_Z_32_mult[31];
-      m_fp_Z_expected[22:0] = m_fp_Z_32_mult[22:0]
-      m_fp_Z_32_mult[30:23] = 8'hFF;
+      m_fp_Z_expected[22:0] = m_fp_Z_32_mult[22:0];
+      m_fp_Z_expected[30:23] = 8'hFF;
       m_ovrf_expected = (m_fp_Z_expected[22])? 0 : 1;
       m_udrf_expected = 0;
 
     end else begin
       // Converts to 64 binary representation to use the extra bits
       m_fp_Z_bits = $realtobits(m_fp_Z);
+
+
+      m_ovrf_expected = 0;
+      m_udrf_expected = 0;
 
       // Same sign bit
       m_fp_Z_expected[31] = m_fp_Z_bits[63];
@@ -74,20 +78,20 @@ class scoreboard extends uvm_scoreboard;
       m_sticky_bit = m_fp_Z_bits[26];
       m_sign_bit = m_fp_Z_expected[31];
 
-      z_plus_exp = m_fp_Z_expected[30:23] - 1;
-      z_plus_mant = m_fp_Z_bits[51:29] + 1;
+      z_plus_mant = m_fp_Z_bits[51:29];// + 1;
+      z_plus_exp = m_fp_Z_expected[30:23];
 
       // If carry occurs shift right
       if(z_plus_mant[23] == 1) begin
         z_plus_mant = z_plus_mant >> 1;
+      	z_plus_exp = z_plus_exp - 1;
       end
 
       case (t.r_mode)
         3'b000: begin
-          if (m_round_bit == 0) begin end
+          if (m_round_bit == 0) begin
              m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
-          end
-          if else (m_round_bit && (m_guard_bit && m_sticky_bit)) begin
+          end else if (m_round_bit && (m_guard_bit && m_sticky_bit)) begin
              m_fp_Z_expected[30:23]  = z_plus_exp;
              m_fp_Z_expected[22:0] = z_plus_mant[22:0];
           end else begin
@@ -135,6 +139,7 @@ class scoreboard extends uvm_scoreboard;
       endcase
     end
 
+    $display("64 bit float = %h  round method = %h", m_fp_Z_bits, t.r_mode);
 
     // Round bit
     if (m_fp_Z_expected != t.fp_Z || t.ovrf != m_ovrf_expected || t.udrf != m_udrf_expected) begin

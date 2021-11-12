@@ -1,5 +1,3 @@
-typedef enum { lectura, escritura, reset} tipo_trans; 
-
 class trans_mul extends uvm_sequence_item;
 
   `uvm_object_utils_begin(trans_mul)

@@ -1,5 +1,5 @@
 // Driver
-class driver #(parameter width =16) extends uvm_driver #(trans_mul);
+class driver extends uvm_driver #(trans_mul);
     `uvm_component_utils(driver)
 
     uvm_analysis_port #(trans_mul) driver_aport;
@@ -25,7 +25,7 @@ class driver #(parameter width =16) extends uvm_driver #(trans_mul);
         // Logica que corre continuamente
         @(posedge vif.clk);
         forever begin
-            trans_mul #(.width(width)) item;
+            trans_mul item;
 
             // Se extrae nuevo item y se espera a flanco de reloj
             seq_item_port.get_next_item(item);

@@ -4,9 +4,9 @@ import uvm_pkg::*;
 // Union de checker scoreboard, se le añaden colas del scoreboard
 class scoreboard extends uvm_scoreboard;
   `uvm_component_utils_begin(scoreboard)
-    `uvm_field_int(m_fp_Y, UVM_DEFAULT)
-    `uvm_field_int(m_fp_X, UVM_DEFAULT)
-    `uvm_field_int(m_fp_Z_bits, UVM_DEFAULT)
+    `uvm_field_real(m_fp_Y, UVM_DEFAULT)
+    `uvm_field_real(m_fp_X, UVM_DEFAULT)
+    `uvm_field_real(m_fp_Z_bits, UVM_DEFAULT) 
     `uvm_field_int(m_sign_bit, UVM_DEFAULT)
     `uvm_field_int(m_round_bit, UVM_DEFAULT)
     `uvm_field_int(m_guard_bit, UVM_DEFAULT)
@@ -14,7 +14,7 @@ class scoreboard extends uvm_scoreboard;
     `uvm_field_int(m_fp_Z_expected, UVM_DEFAULT)
     `uvm_field_int(m_ovrf_expected, UVM_DEFAULT)
     `uvm_field_int(m_udrf_expected, UVM_DEFAULT)
-  `uvm_component_utils_begin
+  `uvm_component_utils_end
   // Puerto de transacciones del driver
   uvm_analysis_imp #(trans_mul, scoreboard) m_analysis_imp;
 
@@ -188,7 +188,7 @@ class scoreboard extends uvm_scoreboard;
 
     // Compares the result from the DUT from the expected
     if (m_fp_Z_expected != t.fp_Z || t.ovrf != m_ovrf_expected || t.udrf != m_udrf_expected) begin
-      `uvm_error("SCOREBOARD", $sformatf("Invalid result \nExpected = %h, receive = %h \novrf_expected = %h, receive = %h \nundrflw_expected = %h, receive = %h \n\n %s", 
+      `uvm_error("SCOREBOARD", $sformatf("Invalid result\nRounding mode = %b, \nExpected = %h, receive = %h \novrf_expected = %h, receive = %h \nundrflw_expected = %h, receive = %h \n\n %s", t.r_mode, 
        m_fp_Z_expected, t.fp_Z, m_ovrf_expected, t.ovrf, m_udrf_expected, t.udrf, this.sprint()));
     end
 

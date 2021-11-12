@@ -48,6 +48,7 @@ class driver #(parameter width =16) extends uvm_driver #(trans_mul);
     virtual task driver_item(trans_mul item);
         vif.r_mode = item.r_mode;
         vif.fp_X = item.fp_X;
+	vif.fp_Y = item.fp_Y;
     endtask
 
     // Funcion para almacenar resultado en item y enviarlo a scoreboard

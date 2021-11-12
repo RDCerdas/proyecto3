@@ -7,8 +7,8 @@ class scoreboard extends uvm_scoreboard;
   // Puerto de transacciones del driver
   uvm_analysis_imp #(trans_mul, scoreboard) m_analysis_imp;
 
-  real m_fp_Y;
-  real m_fp_X;
+  shortreal m_fp_Y;
+  shortreal m_fp_X;
   real m_fp_Z;
 
   function new(string name = "scoreboard", uvm_component parent = null);
@@ -22,10 +22,12 @@ class scoreboard extends uvm_scoreboard;
 
   virtual function void write(trans_mul t);
     `uvm_info("SCOREBOARD", $sformatf("\nTransaction received\n%s\n", t.sprint()), UVM_DEBUG)
-    m_fp_Y = t.fp_Y;
-    m_fp_X = t.fp_X;
-    $display("fp_Y = %f, fp_X = %f, m_fp_Y = %f, m_fp_X = %f", t.fp_Y, t.fp_X, m_fp_Y, m_fp_X);    
-    $display("fp_Z = %f, m_fp_Z = %f", t.fp_Z, m_fp_Z); 
+    m_fp_Y = $bitstoshortreal(t.fp_Y);
+    m_fp_X = $bitstoshortreal(t.fp_X);
+    m_fp_Z = m_fp_Y*m_fp_X;
+    m_fp_Z = $realtobits(m_fp_Z);
+    $display("fp_Y = %h, fp_X = %h, m_fp_Y = %h, m_fp_X = %h", t.fp_Y, t.fp_X, m_fp_Y, m_fp_X);    
+    $display("fp_Z = %h, m_fp_Z = %h", t.fp_Z, m_fp_Z); 
   endfunction
 
     virtual function void report_phase(uvm_phase phase);

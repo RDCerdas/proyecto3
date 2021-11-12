@@ -6,9 +6,9 @@ class trans_mul extends uvm_sequence_item;
     `uvm_field_int(ovrf, UVM_DEFAULT)
     `uvm_field_int(udrf, UVM_DEFAULT)
     `uvm_field_int(r_mode, UVM_DEFAULT)
-    `uvm_field_real(fp_X,UVM_DEFAULT)
-    `uvm_field_real(fp_Y, UVM_DEFAULT)
-    `uvm_field_real(fp_Z, UVM_DEFAULT)
+    `uvm_field_int(fp_X,UVM_DEFAULT)
+    `uvm_field_int(fp_Y, UVM_DEFAULT)
+    `uvm_field_int(fp_Z, UVM_DEFAULT)
   `uvm_object_utils_end
 
   constraint caso_cero {if(fp_X[30:23]==0)

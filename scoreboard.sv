@@ -9,6 +9,8 @@ class scoreboard extends uvm_scoreboard;
 
   shortreal m_fp_Y;
   shortreal m_fp_X;
+  real m_fp_Y_real;
+  real m_fp_X_real;
   real m_fp_Z;
   bit [31:0] m_fp_Z_32_mult;
   bit [63:0] m_fp_Z_bits;
@@ -39,8 +41,13 @@ class scoreboard extends uvm_scoreboard;
     m_fp_Y = $bitstoshortreal(t.fp_Y);
     m_fp_X = $bitstoshortreal(t.fp_X);
 
+    m_fp_Y_real = m_fp_Y;
+    m_fp_X_real = m_fp_X;
+
     // 64 bits operation
-    m_fp_Z = m_fp_Y*m_fp_X;
+    m_fp_Z = m_fp_Y_real*m_fp_X_real;
+
+
 
     // Convert to 32 bit representation
     m_fp_Z_32_mult = $shortrealtobits(m_fp_Z);
@@ -78,7 +85,7 @@ class scoreboard extends uvm_scoreboard;
       m_sticky_bit = m_fp_Z_bits[26];
       m_sign_bit = m_fp_Z_expected[31];
 
-      z_plus_mant = m_fp_Z_bits[51:29];// + 1;
+      z_plus_mant = m_fp_Z_bits[51:29] + 1;
       z_plus_exp = m_fp_Z_expected[30:23];
 
       // If carry occurs shift right
@@ -91,7 +98,7 @@ class scoreboard extends uvm_scoreboard;
         3'b000: begin
           if (m_round_bit == 0) begin
              m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
-          end else if (m_round_bit && (m_guard_bit && m_sticky_bit)) begin
+          end else if (m_round_bit && (m_guard_bit || m_sticky_bit)) begin
              m_fp_Z_expected[30:23]  = z_plus_exp;
              m_fp_Z_expected[22:0] = z_plus_mant[22:0];
           end else begin

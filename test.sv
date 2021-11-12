@@ -41,10 +41,10 @@ class random_test extends base_test;
 
         phase.raise_objection(this);
 
-        trans_aleatoria_inst.num_transacciones = 250;
+        trans_aleatoria_inst.num_transacciones = 1000;
         trans_aleatoria_inst.start(e0.agent_inst.sequencer_inst);
 
-        #1000;
+        #500;
         phase.drop_objection(this);
 endtask
 endclass

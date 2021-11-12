@@ -3,7 +3,7 @@ class agent  extends uvm_agent;
     `uvm_component_utils(agent)
     
     driver driver_inst;
-    uvm_sequencer  sequencer_inst;
+    uvm_sequencer #(trans_mul)  sequencer_inst;
 
     function new(string name = "agent", uvm_component parent = null);
         super.new(name, parent);

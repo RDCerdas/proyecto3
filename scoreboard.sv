@@ -10,6 +10,7 @@ class scoreboard extends uvm_scoreboard;
   shortreal m_fp_Y;
   shortreal m_fp_X;
   real m_fp_Z;
+  shortreal m_fp_Z_32_bits;
   bit [63:0] m_fp_Z_bits;
   bit [31:0] m_fp_Z_expected;
 
@@ -30,9 +31,12 @@ class scoreboard extends uvm_scoreboard;
 
     // 64 bits operation
     m_fp_Z = m_fp_Y*m_fp_X;
+    m_fp_Z_32_bits = m_fp_Z;
 
     // Converts to binary representation
     m_fp_Z_bits = $realtobits(m_fp_Z);
+
+    $display("Float = %h", $shortrealtobits(m_fp_Z));
 
     // Same sign bit
     m_fp_Z_expected[31] = m_fp_Z_bits[63];

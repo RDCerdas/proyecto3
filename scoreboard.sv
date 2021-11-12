@@ -37,11 +37,12 @@ class scoreboard extends uvm_scoreboard;
     // Same sign bit
     m_fp_Z_expected[31] = m_fp_Z_bits[63];
 
+    $display("Exponente = %h", m_fp_Z_bits[62:52]);
     // Conversion to 64 bit exponent to 32
-    m_fp_Z_expected[30:21] = m_fp_Z_bits[62:52]-1023+127;
+    m_fp_Z_expected[30:23] = m_fp_Z_bits[62:52]-896;
     
     // First 22 bits of mantisa
-    m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29]
+    m_fp_Z_expected[22:0] = m_fp_Z_bits[51:29];
 
     // Round bit
     if (m_fp_Z_expected != t.fp_Z) begin

@@ -49,4 +49,59 @@ class random_test extends base_test;
 endtask
 endclass
 
+class test_especifico extends base_test;
+    `uvm_component_utils(test_especifico)
+
+    function new(string name = "test_especifico", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
+    virtual function void build_phase(uvm_phase phase);
+    	super.build_phase(phase);
+    endfunction
+
+    virtual task run_phase(uvm_phase phase);
+        trans_especifica trans_especifica_inst = trans_especifica::type_id::create("trans_especifica_inst");
+
+        `uvm_info("Specific test", $sformatf("\n Specific test started\n"), UVM_HIGH)
+
+        phase.raise_objection(this);
+        //zeroxzero
+        trans_especifica_inst.fp_X = 0; 
+        trans_especifica_inst.fp_Y = 0;
+        trans_especifica_inst.r_mode =       
+        trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
+        //zeroxnan
+        trans_especifica_inst.fp_X = 0; 
+        trans_especifica_inst.fp_Y = 32'h7FC00000; //nan  
+        trans_especifica_inst.r_mode =         
+        trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
+        //zeroxinf
+        trans_especifica_inst.fp_X = 0; 
+        trans_especifica_inst.fp_Y = 32'h7F800000; //infinito
+        trans_especifica_inst.r_mode =         
+        trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
+        //infxinf
+        trans_especifica_inst.fp_X = 32'h7F800000; //infinito
+        trans_especifica_inst.fp_Y = 32'h7F800000; //infinito
+        trans_especifica_inst.r_mode =          
+        trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
+        //infxnan
+        trans_especifica_inst.fp_X = 32'h7F800000; //infinito 
+        trans_especifica_inst.fp_Y = 32'h7FC00000; //nan  
+        trans_especifica_inst.r_mode =          
+        trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
+
+        //nanxnan
+        trans_especifica_inst.fp_X = 32'h7FC00000; //nan 
+        trans_especifica_inst.fp_Y = 32'h7FC00000; //nan  
+        trans_especifica_inst.r_mode =          
+        trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
+
+        #500;
+        phase.drop_objection(this);
+endtask
+endclass
+
+
 

@@ -69,33 +69,45 @@ class test_especifico extends base_test;
         //zeroxzero
         trans_especifica_inst.fp_X = 0; 
         trans_especifica_inst.fp_Y = 0;
-        trans_especifica_inst.r_mode =       
+        trans_especifica_inst.r_mode = 0;      
         trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
         //zeroxnan
         trans_especifica_inst.fp_X = 0; 
-        trans_especifica_inst.fp_Y = 32'h7FC00000; //nan  
-        trans_especifica_inst.r_mode =         
+        trans_especifica_inst.fp_Y = 32'hFFC00000; //nan  
+        trans_especifica_inst.r_mode = 0;        
         trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
         //zeroxinf
         trans_especifica_inst.fp_X = 0; 
-        trans_especifica_inst.fp_Y = 32'h7F800000; //infinito
-        trans_especifica_inst.r_mode =         
+        trans_especifica_inst.fp_Y = 32'hFF800000; //infinito
+        trans_especifica_inst.r_mode = 0;        
         trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
         //infxinf
-        trans_especifica_inst.fp_X = 32'h7F800000; //infinito
-        trans_especifica_inst.fp_Y = 32'h7F800000; //infinito
-        trans_especifica_inst.r_mode =          
+        trans_especifica_inst.fp_X = 32'hFF800000; //infinito
+        trans_especifica_inst.fp_Y = 32'hFF800000; //infinito
+        trans_especifica_inst.r_mode = 0;         
         trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
         //infxnan
-        trans_especifica_inst.fp_X = 32'h7F800000; //infinito 
-        trans_especifica_inst.fp_Y = 32'h7FC00000; //nan  
-        trans_especifica_inst.r_mode =          
+        trans_especifica_inst.fp_X = 32'hFF800000; //infinito 
+        trans_especifica_inst.fp_Y = 32'hFFC00000; //nan  
+        trans_especifica_inst.r_mode = 0;         
         trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
 
         //nanxnan
-        trans_especifica_inst.fp_X = 32'h7FC00000; //nan 
-        trans_especifica_inst.fp_Y = 32'h7FC00000; //nan  
-        trans_especifica_inst.r_mode =          
+        trans_especifica_inst.fp_X = 32'hFFC00000; //nan 
+        trans_especifica_inst.fp_Y = 32'hFFC00000; //nan  
+        trans_especifica_inst.r_mode = 0;         
+        trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
+
+        //3x10_8x3x10_8
+        trans_especifica_inst.fp_X = 3.3e38; 
+        trans_especifica_inst.fp_Y = 3.3e38;  
+        trans_especifica_inst.r_mode = 0;         
+        trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
+
+        //3.3x10_-38x3.3x10_-38
+        trans_especifica_inst.fp_X = 3.3e-38;
+        trans_especifica_inst.fp_Y = 3.3e-38;   
+        trans_especifica_inst.r_mode = 0;         
         trans_especifica_inst.start(e0.agent_inst.sequencer_inst);
 
         #500;

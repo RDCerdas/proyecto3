@@ -43,7 +43,7 @@ class random_test extends base_test;
         phase.raise_objection(this);
         
         // Se define el número de transacciones
-        trans_aleatoria_inst.num_transacciones = 10;
+        trans_aleatoria_inst.num_transacciones = 5000;
         // Se llama el secuenciador
         trans_aleatoria_inst.start(e0.agent_inst.sequencer_inst);
 

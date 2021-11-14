@@ -44,7 +44,7 @@ module test_bench;
     run_test();
   end
   int zero;
-  int infinite:
+  int infinite;
   always @ * begin
     if (t.fp_Z[30:0] == 0) begin
       zero=1;

@@ -43,21 +43,26 @@ module test_bench;
 
     run_test();
   end
-  int zero;
-  int infinite;
-  always @ * begin
-    if (_if.fp_Z[30:0] == 0) begin
-      zero=1;
-      _assert_zero:assert property (@(posedge _if.clk) zero |->  _if.udrf)
-      else `uvm_error("Test","Error underflow flag")
-      zero=0;
-    end else if ((_if.fp_Z[22:0] == 0) && (_if.fp_Z[30:23] == 8'hFF) ) begin
-      infinite = 1;
-      _assert_inf:assert property (@(posedge _if.clk) infinite |->  _if.ovrf)
+  assert property (@(posedge _if.clk) _if.fp_Z[22:0] == 0 || _if.fp_Z[30:23] == 8'hFF |->  _if.ovrf)
       else `uvm_error("Test","Error overflow flag")
-      infinite = 0; 
-  end
-end
+  assert property (@(posedge _if.clk) _if.fp_Z[30:0] == 0 |->  _if.udrf)
+  else `uvm_error("Test","Error underflow flag")
+
+  //int zero;
+ // int infinite;
+  //always @ * begin
+    //if (_if.fp_Z[30:0] == 0) begin
+     // zero=1;
+      //_assert_zero:assert property (@(posedge _if.clk) zero |->  _if.udrf)
+      //else `uvm_error("Test","Error underflow flag")
+     // zero=0;
+    //end else if ((_if.fp_Z[22:0] == 0) && (_if.fp_Z[30:23] == 8'hFF) ) begin
+      //infinite = 1;
+      //_assert_inf:assert property (@(posedge _if.clk) infinite |->  _if.ovrf)
+      //else `uvm_error("Test","Error overflow flag")
+      //infinite = 0; 
+ // end
+//end
 
 
  

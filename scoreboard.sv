@@ -39,8 +39,6 @@ class scoreboard extends uvm_scoreboard;
   	`uvm_field_int(trans_fp_X, UVM_DEFAULT)
   	`uvm_field_int(trans_fp_Z, UVM_DEFAULT)
   	`uvm_field_int(trans_r_mode, UVM_DEFAULT)
-    `uvm_field_real(m_fp_Y, UVM_DEFAULT)
-    `uvm_field_real(m_fp_X, UVM_DEFAULT)
     `uvm_field_int(m_fp_Z_bits, UVM_DEFAULT)
   	`uvm_field_int(m_fp_Z_32_mult, UVM_DEFAULT)
     `uvm_field_int(m_sign_bit, UVM_DEFAULT)
@@ -140,7 +138,8 @@ class scoreboard extends uvm_scoreboard;
     // If underflow
     if (m_fp_Z_32_mult[30:23] == 0) begin
       // Expected Exp = 0 y Fracc = 0
-      m_fp_Z_expected[31] = m_fp_Z_32_mult[31];
+      // If it is 0 sign bit doesn't matter
+      m_fp_Z_expected[31] = t.fp_Z[31];
       m_fp_Z_expected[30:23] = '0;
       m_fp_Z_expected[22:0] = '0;
       m_ovrf_expected = 0;
@@ -149,7 +148,8 @@ class scoreboard extends uvm_scoreboard;
     // If inf or Nan
     end else if ((m_fp_Z_32_mult[30:23] == 8'hFF)) begin
       // Inf or Nan
-      m_fp_Z_expected[31] = m_fp_Z_32_mult[31];
+      // Sign bit doesn't matter
+      m_fp_Z_expected[31] = t.fp_Z[31];
       m_fp_Z_expected[22:0] = m_fp_Z_32_mult[22:0];
       m_fp_Z_expected[30:23] = 8'hFF;
       m_ovrf_expected = (m_fp_Z_expected[22])? 0 : 1;
@@ -288,6 +288,7 @@ class scoreboard extends uvm_scoreboard;
         `uvm_info("SCOREBOARD REPORT", $sformatf("Transaction \n%s", transaction.sprint()), UVM_MEDIUM);
         transaction.fwrite(file_csv);
       end
+      $fclose(file_csv);
     endfunction
 endclass 
 

@@ -46,14 +46,14 @@ module test_bench;
   int zero;
   int infinite;
   always @ * begin
-    if (t.fp_Z[30:0] == 0) begin
+    if (_if.fp_Z[30:0] == 0) begin
       zero=1;
-      _assert_zero:assert property ( zero |->  t.udrf)
+      _assert_zero:assert property ( zero |->  _if.udrf)
       else `uvm_error("Test","Error underflow flag")
       zero=0;
-    end else if ((t.fp_Z[22:0] == 0) && (t.fp_Z[30:23] == 8'hFF) ) begin
+    end else if ((_if.fp_Z[22:0] == 0) && (_if.fp_Z[30:23] == 8'hFF) ) begin
       infinite = 1;
-      _assert_inf:assert property ( infinite |->  t.ovrf)
+      _assert_inf:assert property ( infinite |->  _if.ovrf)
       else `uvm_error("Test","Error overflow flag")
       infinite = 0; 
   end

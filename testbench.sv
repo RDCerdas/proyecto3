@@ -43,5 +43,22 @@ module test_bench;
 
     run_test();
   end
+  int zero;
+  int infinite:
+  always @ * begin
+    if (t.fp_Z[30:0] == 0) begin
+      zero=1;
+      _assert_zero:assert property ( zero |->  t.udrf)
+      else `uvm_error("Test","Error underflow flag")
+      zero=0;
+    end else if ((t.fp_Z[22:0] == 0) && (t.fp_Z[30:23] == hFF) ) begin
+      infinite = 1;
+      _assert_inf:assert property ( infinite |->  t.ovrf)
+      else `uvm_error("Test","Error overflow flag")
+      infinite = 0; 
+  end
+end
+
+
  
 endmodule

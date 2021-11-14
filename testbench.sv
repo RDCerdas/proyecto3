@@ -51,7 +51,7 @@ module test_bench;
       _assert_zero:assert property ( zero |->  t.udrf)
       else `uvm_error("Test","Error underflow flag")
       zero=0;
-    end else if ((t.fp_Z[22:0] == 0) && (t.fp_Z[30:23] == hFF) ) begin
+    end else if ((t.fp_Z[22:0] == 0) && (t.fp_Z[30:23] == 8'hFF) ) begin
       infinite = 1;
       _assert_inf:assert property ( infinite |->  t.ovrf)
       else `uvm_error("Test","Error overflow flag")

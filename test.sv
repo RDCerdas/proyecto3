@@ -22,7 +22,7 @@ class base_test extends uvm_test;
     endfunction
 endclass
 
-// Test que hereda del base con transacciones específicas
+// Test que hereda del base con transacciones aleatorias
 class random_test extends base_test;
     `uvm_component_utils(random_test)
 
@@ -35,13 +35,16 @@ class random_test extends base_test;
     endfunction
 
     virtual task run_phase(uvm_phase phase);
+        // Se instancia un test de secuencias aleatorias
         sec_trans_aleatorias trans_aleatoria_inst = sec_trans_aleatorias::type_id::create("trans_aleatoria_inst");
 
         `uvm_info("RANDOM TEST", $sformatf("\n Random test started\n"), UVM_HIGH)
 
         phase.raise_objection(this);
-
-        trans_aleatoria_inst.num_transacciones = 1000;
+        
+        // Se define el número de transacciones
+        trans_aleatoria_inst.num_transacciones = 10;
+        // Se llama el secuenciador
         trans_aleatoria_inst.start(e0.agent_inst.sequencer_inst);
 
         #500;

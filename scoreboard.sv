@@ -1,12 +1,48 @@
 
 import uvm_pkg::*;
 
+// Package to store al current variables for report
+class report_package extends uvm_object;
+  `uvm_object_utils_begin(report_package)
+  `uvm_field_int(m_time, UVM_DEFAULT|UVM_DEC)
+  `uvm_field_int(m_r_mode, UVM_DEFAULT)
+  `uvm_field_int(m_fp_X, UVM_DEFAULT)
+  `uvm_field_int(m_fp_Y, UVM_DEFAULT)
+  `uvm_field_int(m_fp_Z,UVM_DEFAULT)
+  `uvm_field_int(m_fp_Z_expected, UVM_DEFAULT)
+  `uvm_field_int(m_fp_Z_long, UVM_DEFAULT)
+  `uvm_object_utils_end
+
+  // Variables to save from each package
+  int m_time;
+  bit [2:0] m_r_mode;
+  bit [31:0] m_fp_X;
+  bit [31:0] m_fp_Y;
+  bit [31:0] m_fp_Z;
+  bit [31:0] m_fp_Z_expected;
+  bit [63:0] m_fp_Z_long;
+
+  function new(string name = "report_package");
+    super.new(name);
+  endfunction
+
+  //Function to write to file in csv format
+  function void fwrite(int file);
+    $fwrite(file, "%0d, %0h, %0h, %0h, %0h, %0h, %0h\n", this.m_time, this.m_r_mode, this.m_fp_X, this.m_fp_Y, this.m_fp_Z, this.m_fp_Z_expected, this.m_fp_Z_long);
+  endfunction
+endclass
+
 // Union de checker scoreboard, se le añaden colas del scoreboard
 class scoreboard extends uvm_scoreboard;
   `uvm_component_utils_begin(scoreboard)
+  	`uvm_field_int(trans_fp_Y, UVM_DEFAULT)
+  	`uvm_field_int(trans_fp_X, UVM_DEFAULT)
+  	`uvm_field_int(trans_fp_Z, UVM_DEFAULT)
+  	`uvm_field_int(trans_r_mode, UVM_DEFAULT)
     `uvm_field_real(m_fp_Y, UVM_DEFAULT)
     `uvm_field_real(m_fp_X, UVM_DEFAULT)
-    `uvm_field_real(m_fp_Z_bits, UVM_DEFAULT) 
+    `uvm_field_int(m_fp_Z_bits, UVM_DEFAULT)
+  	`uvm_field_int(m_fp_Z_32_mult, UVM_DEFAULT)
     `uvm_field_int(m_sign_bit, UVM_DEFAULT)
     `uvm_field_int(m_round_bit, UVM_DEFAULT)
     `uvm_field_int(m_guard_bit, UVM_DEFAULT)
@@ -17,7 +53,14 @@ class scoreboard extends uvm_scoreboard;
   `uvm_component_utils_end
   // Puerto de transacciones del driver
   uvm_analysis_imp #(trans_mul, scoreboard) m_analysis_imp;
+  
+  // Variables for printing package variables
+  bit [31:0] trans_fp_Y;
+  bit [31:0] trans_fp_X;
+  bit [31:0] trans_fp_Z;
+  bit [2:0] trans_r_mode;
 
+  // Variables to store multiplication data
   shortreal m_fp_Y;
   shortreal m_fp_X;
   real m_fp_Y_real;
@@ -26,6 +69,7 @@ class scoreboard extends uvm_scoreboard;
   bit [31:0] m_fp_Z_32_mult;
   bit [63:0] m_fp_Z_bits;
 
+  // Expected and rounding vairables
   bit [31:0] m_fp_Z_expected;
   bit m_ovrf_expected;
   bit m_udrf_expected;
@@ -34,8 +78,15 @@ class scoreboard extends uvm_scoreboard;
   bit m_sticky_bit;
   bit m_sign_bit;
 
+  // Variables to round up
   bit [7:0] z_plus_exp;
   bit [23:0] z_plus_mant;
+
+  // Queue to store data until report phase
+  report_package report_queue[$];
+
+  // csv file to store report
+  int file_csv;
 
   function new(string name = "scoreboard", uvm_component parent = null);
     super.new(name, parent);
@@ -46,7 +97,30 @@ class scoreboard extends uvm_scoreboard;
 	m_analysis_imp = new("m_analysis_imp", this);
   endfunction
 
+  // Function to save transaction in queue
+  function void save_transaction(trans_mul t);
+    report_package pkg = report_package::type_id::create("pkg");
+
+    // Give each value to each packet
+    pkg.m_time = t.m_time;
+    pkg.m_r_mode = t.r_mode;
+    pkg.m_fp_X = t.fp_X;
+    pkg.m_fp_Y = t.fp_Y;
+    pkg.m_fp_Z = t.fp_Z;
+    pkg.m_fp_Z_expected = this.m_fp_Z_expected;
+    pkg.m_fp_Z_long = this.m_fp_Z_bits;
+
+    // Saves it on queue
+    this.report_queue.push_back(pkg);
+  endfunction
+
   virtual function void write(trans_mul t);
+    // Transfer transaction data to local variables for printing
+    trans_fp_Y = t.fp_Y;
+    trans_fp_X = t.fp_X;
+    trans_fp_Z = t.fp_Z;
+    trans_r_mode = t.r_mode;
+    
     `uvm_info("SCOREBOARD", $sformatf("\nTransaction received\n%s\n", t.sprint()), UVM_DEBUG)
     // Conversion de shortreal type
     m_fp_Y = $bitstoshortreal(t.fp_Y);
@@ -188,17 +262,32 @@ class scoreboard extends uvm_scoreboard;
 
     // Compares the result from the DUT from the expected
     if (m_fp_Z_expected != t.fp_Z || t.ovrf != m_ovrf_expected || t.udrf != m_udrf_expected) begin
-      `uvm_error("SCOREBOARD", $sformatf("Invalid result\nRounding mode = %b, \nExpected = %h, receive = %h \novrf_expected = %h, receive = %h \nundrflw_expected = %h, receive = %h \n\n %s", t.r_mode, 
+      `uvm_error("SCOREBOARD", $sformatf("Invalid result\nExpected = %h, receive = %h \novrf_expected = %h, receive = %h \nundrflw_expected = %h, receive = %h \n\n %s", 
        m_fp_Z_expected, t.fp_Z, m_ovrf_expected, t.ovrf, m_udrf_expected, t.udrf, this.sprint()));
     end
+
+    // Saves transaction for queue for later report
+    this.save_transaction(t);
 
   endfunction
 
     virtual function void report_phase(uvm_phase phase);
-		// Reporte de misses y matches al final de la corrida
-    // Se realiza el reporte al igual que con el scoreboard original
+		// Report of every package
     	super.report_phase(phase);
-        `uvm_info("SCOREBOARD REPORT", $sformatf("\nScore board: el retardo promedio"), UVM_LOW);
+      `uvm_info("SCOREBOARD REPORT", $sformatf(" Generating report"), UVM_LOW);
+
+      // Open file for writting 
+      file_csv = $fopen("report.csv", "w");
+      // Write csv header
+      $fwrite(file_csv, "Time,Rounding Mode,fp_X,fp_Y,fp_Z,fp_Z Expected,fp_Z 64 bits\n");
+
+      // Until no transactions left
+      while (this.report_queue.size() > 0) begin
+        report_package transaction;
+        transaction = this.report_queue.pop_front();
+        `uvm_info("SCOREBOARD REPORT", $sformatf("Transaction \n%s", transaction.sprint()), UVM_MEDIUM);
+        transaction.fwrite(file_csv);
+      end
     endfunction
 endclass 
 

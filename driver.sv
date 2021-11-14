@@ -1,7 +1,8 @@
 // Driver
 class driver extends uvm_driver #(trans_mul);
     `uvm_component_utils(driver)
-
+    
+    // Puerto para enviar transacciones al scoreboard
     uvm_analysis_port #(trans_mul) driver_aport;
 
     virtual mult_if vif;
@@ -21,15 +22,17 @@ class driver extends uvm_driver #(trans_mul);
 	// Cada transaccion que recibe
     virtual task run_phase(uvm_phase phase);
         super.run_phase(phase);
-            @(posedge vif.clk);
-        // Logica que corre continuamente
         @(posedge vif.clk);
+        // Logica que corre continuamente
+
         forever begin
             trans_mul item;
 
             // Se extrae nuevo item y se espera a flanco de reloj
             seq_item_port.get_next_item(item);
-            @(posedge vif.clk);
+
+            // Wait for delay clock cicles
+            repeat(item.delay) @(posedge vif.clk);
 
             `uvm_info("DRIVER", $sformatf("\nItem receive \n %s", item.sprint()), UVM_HIGH)
             driver_item(item);
@@ -56,6 +59,7 @@ class driver extends uvm_driver #(trans_mul);
         item.fp_Z = vif.fp_Z;
         item.ovrf = vif.ovrf;
         item.udrf = vif.udrf;
+        item.m_time = $time;
         driver_aport.write(item);
         `uvm_info("DRIVER", $sformatf("\nItem send to checker \n %s", item.sprint()), UVM_DEBUG)
     endtask

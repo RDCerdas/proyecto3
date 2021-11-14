@@ -44,9 +44,9 @@ module test_bench;
     run_test();
   end
   assert property (@(posedge _if.clk) _if.fp_Z[22:0] == 0 || _if.fp_Z[30:23] == 8'hFF |->  _if.ovrf)
-      else `uvm_error("Test",$sformatf( "Resultado = %h",_if.fp_Z, this.sprint()));
+      else `uvm_error("Test","Error overflow flag");
   assert property (@(posedge _if.clk) _if.fp_Z[30:0] == 0 |->  _if.udrf)
-  else `uvm_error("Test",$sformatf( "Resultado = %h",_if.fp_Z, this.sprint()));
+  else `uvm_error("Test","Error underflow flag");
 
   //int zero;
  // int infinite;

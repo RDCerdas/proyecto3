@@ -44,9 +44,9 @@ module test_bench;
     run_test();
   end
   assert property (@(posedge _if.clk) _if.fp_Z[22:0] == 0 || _if.fp_Z[30:23] == 8'hFF |->  _if.ovrf)
-      else `uvm_error("Test","Error overflow flag dato= %h", _if.udrf )
+      else `uvm_error("Test","Error overflow flag dato= %h", _if.udrf ));
   assert property (@(posedge _if.clk) _if.fp_Z[30:0] == 0 |->  _if.udrf)
-  else `uvm_error("Test", $sformatf("Error underflow flag")
+  else `uvm_error("Test", $sformatf("Error underflow flag dato= %h", _if.udrf ));
 
   //int zero;
  // int infinite;

@@ -16,6 +16,7 @@ class env extends uvm_env;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
+	// Se crea el scoreboard y el agente
         agent_inst = agent::type_id::create("agent_inst", this);
         scoreboard_inst = scoreboard::type_id::create("scoreboard_inst", this);
     endfunction

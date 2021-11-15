@@ -56,6 +56,7 @@ class driver extends uvm_driver #(trans_mul);
 
     // Funcion para almacenar resultado en item y enviarlo a scoreboard
     virtual task get_result(trans_mul item);
+    	// Se leen todos los resultados y se obtiene el tiempo
         item.fp_Z = vif.fp_Z;
         item.ovrf = vif.ovrf;
         item.udrf = vif.udrf;

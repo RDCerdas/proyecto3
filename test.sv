@@ -13,11 +13,12 @@ class base_test extends uvm_test;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
+	// Se crea el ambiente
         e0 = env::type_id::create("e0", this);
-		// Se toma interfaz
+	// Se toma interfaz
         if(!uvm_config_db#(virtual mult_if)::get(this, "", "_if", vif))
             `uvm_fatal("Test", "Could not get vif")
-
+	// Se pasa la interfaz al agente
         uvm_config_db#(virtual mult_if)::set(this, "e0.agent_inst.*", "_if", vif);
     endfunction
 endclass
@@ -47,7 +48,7 @@ class random_test extends base_test;
         // Se llama el secuenciador
         trans_aleatoria_inst.start(e0.agent_inst.sequencer_inst);
 
-        #500;
+        #1000;
         phase.drop_objection(this);
 endtask
 endclass
@@ -64,6 +65,7 @@ class test_especifico extends base_test;
     endfunction
 
     virtual task run_phase(uvm_phase phase);
+    	// Si instancia una secuencia especifica
         trans_especifica trans_especifica_inst = trans_especifica::type_id::create("trans_especifica_inst");
 
         `uvm_info("Specific test", $sformatf("\n Specific test started\n"), UVM_HIGH)

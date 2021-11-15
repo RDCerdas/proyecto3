@@ -46,11 +46,11 @@ module test_bench;
 
   // Aserciones
   // Se verifica que si fp_Z es infinito se levante la señál de overflow
-  assert property (@(posedge _if.clk) _if.fp_Z[22:0] == 0 && _if.fp_Z[30:23] == 8'hFF |->  _if.ovrf)
-      else `uvm_error("Test",$sformatf("Error overflow flag dato= %h, overflow= %b", _if.fp_Z, _if.ovrf ));
+  assert property (@(_if.fp_Z) _if.fp_Z[22:0] == 0 && _if.fp_Z[30:23] == 8'hFF |->  _if.ovrf)
+      else `uvm_error("Test",$sformatf("Error overflow flag  overflow= %b", _if.ovrf ));
   // Se verifica que si fp_Z es cero se levante la bandera de underflow
-  assert property (@(posedge _if.clk) _if.fp_Z[30:0] == 0 |->  _if.udrf)
-      else `uvm_error("Test", $sformatf("Error underflow flag dato= %h, underflow= %b",_if.fp_Z, _if.udrf ));
+  assert property (@(_if.fp_Z) _if.fp_Z[30:0] == 0 |->  _if.udrf)
+      else `uvm_error("Test", $sformatf("Error underflow flag  underflow= %b", _if.udrf ));
 
  
 endmodule
